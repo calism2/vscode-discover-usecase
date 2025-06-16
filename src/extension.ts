@@ -7,6 +7,8 @@ type Handler = {
 };
 
 let handlers: Handler[];
+let outputChannel: vscode.OutputChannel =
+  vscode.window.createOutputChannel("UseCaseDiscovery");
 
 export function activate(context: vscode.ExtensionContext) {
   const discoverCommand = vscode.commands.registerCommand(
@@ -59,6 +61,10 @@ function parseUseCaseHandler(input: string): Handler {
   const mainType = match[1];
   const genericTypes = match[2].split(",").map((type) => type.trim());
 
+  // Output the handler string
+  outputChannel.show();
+  outputChannel.appendLine(`${mainType}<${genericTypes.join(", ")}>`);
+
   return { name: mainType, io: genericTypes };
 }
 
@@ -80,7 +86,7 @@ async function findHandlers(input: string): Promise<string[]> {
   const results = stdout.split("\n").filter((line) => line.trim() !== "");
 
   vscode.window.showInformationMessage(
-    `Found ${results.length} matches for UseCaseHandler<AnyType1, AnyType2>.`
+    `Found ${results.length} matches for ${input}.`
   );
 
   return results;
